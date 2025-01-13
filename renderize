@@ -1,0 +1,28 @@
+from flask import Flask, render_template, request
+from flask_socketio import SocketIO, emit
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'secret!'
+socketio = SocketIO(app)
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@socketio.on('generate_preview')
+def generate_preview(data):
+    try:
+        mod_description = data.get('description', 'A medieval castle with hidden treasure.')
+        preview_data = {
+            "type": "map",
+            "elements": [
+                {"name": "castle", "position": [100, 200], "size": "large"},
+                {"name": "treasure", "position": [150, 300], "visibility": "hidden"}
+            ]
+        }
+        emit('preview_data', {"description": mod_description, "preview": preview_data})
+    except Exception as e:
+        emit('error', {"message": str(e)})
+
+if __name__ == '__main__':
+    socketio.run(app, debug=True)
