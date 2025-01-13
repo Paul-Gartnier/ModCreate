@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ModCreate Preview</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+</head>
+<body>
+    <h1>ModCreate Real-Time Preview</h1>
+    <textarea id="description" rows="4" cols="50" placeholder="Describe your mod..."></textarea>
+    <button onclick="generatePreview()">Generate Preview</button>
+    <div id="preview"></div>
+    <script>
+        const socket = io();
+
+        function generatePreview() {
+            const description = document.getElementById('description').value;
+            socket.emit('generate_preview', { description });
+        }
+
+        socket.on('preview_data', (data) => {
+            console.log(data);
+            document.getElementById('preview').innerHTML = `<p>${data.description}</p>`;
+            // Render preview using p5.js
+            const preview = data.preview;
+            new p5((p) => {
+                p.setup = () => {
+                    p.createCanvas(400, 400);
+                    p.background(220);
+                    preview.elements.forEach((el) => {
+                        if (el.name === "castle") {
+                            p.fill(150);
+                            p.rect(el.position[0], el.position[1], 100, 100);
+                        } else if (el.name === "treasure") {
+                            p.fill(255, 223, 0);
+                            p.ellipse(el.position[0], el.position[1], 50, 50);
+                        }
+                    });
+                };
+            });
+        });
+
+        socket.on('error', (data) => {
+            alert(`Error: ${data.message}`);
+        });
+    </script>
+</body>
+</html>
