@@ -1,0 +1,45 @@
+import os
+from flask import Flask, request, jsonify, send_file
+
+app = Flask(__name__)
+
+GENERATED_FOLDER = "generated_mods"
+os.makedirs(GENERATED_FOLDER, exist_ok=True)
+
+@app.route('/export_mod', methods=['POST'])
+def export_mod():
+    try:
+        data = request.get_json()
+        mod_description = data.get('description', '')
+        engine = data.get('engine', 'unity').lower()  # Ejemplo: 'unity' o 'unreal'
+
+        if not mod_description:
+            return jsonify({'error': 'Mod description is required'}), 400
+
+        filename = f"{engine}_mod.txt"
+        filepath = os.path.join(GENERATED_FOLDER, filename)
+
+        with open(filepath, 'w') as file:
+            file.write(f"Engine: {engine.capitalize()}\n")
+            file.write(f"Description:\n{mod_description}\n")
+
+        return jsonify({'message': 'Mod exported successfully', 'file': filename}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/download_mod/<filename>', methods=['GET'])
+def download_mod(filename):
+    try:
+        filepath = os.path.join(GENERATED_FOLDER, filename)
+        if not os.path.exists(filepath):
+            return jsonify({'error': 'File not found'}), 404
+
+        return send_file(filepath, as_attachment=True)
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+if __name__ == '__main__':
+    app.run(debug=True)
