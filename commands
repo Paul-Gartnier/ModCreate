@@ -1,0 +1,26 @@
+from flask import Flask, request, jsonify
+from transformers import pipeline
+
+app = Flask(__name__)
+
+command_interpreter = pipeline("text-generation", model="gpt-3.5-turbo")
+
+@app.route('/generate_mod', methods=['POST'])
+def generate_mod():
+    try:
+        data = request.get_json()
+        user_command = data.get('command', '')
+
+        if not user_command:
+            return jsonify({'error': 'Command is required'}), 400
+
+        response = command_interpreter(user_command, max_length=100, num_return_sequences=1)
+        mod_description = response[0]['generated_text']
+
+        return jsonify({'description': mod_description}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+if __name__ == '__main__':
+    app.run(debug=True)
