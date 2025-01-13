@@ -1,0 +1,62 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Real-Time Collaboration</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+    <h1>Collaborate on Mods</h1>
+    <div>
+        <input id="username" placeholder="Enter your username">
+        <input id="mod_id" placeholder="Enter mod ID">
+        <button onclick="joinMod()">Join Mod</button>
+        <button onclick="leaveMod()">Leave Mod</button>
+    </div>
+
+    <textarea id="mod_content" rows="10" cols="50" placeholder="Mod content will appear here"></textarea>
+    <button onclick="updateMod()">Update Mod</button>
+
+    <ul id="user_list"></ul>
+
+    <script>
+        const socket = io();
+
+        function joinMod() {
+            const username = document.getElementById('username').value;
+            const mod_id = document.getElementById('mod_id').value;
+            socket.emit('join_mod', { username, mod_id });
+        }
+
+        function leaveMod() {
+            const username = document.getElementById('username').value;
+            const mod_id = document.getElementById('mod_id').value;
+            socket.emit('leave_mod', { username, mod_id });
+        }
+
+        function updateMod() {
+            const mod_id = document.getElementById('mod_id').value;
+            const content = document.getElementById('mod_content').value;
+            socket.emit('update_mod', { mod_id, content });
+        }
+
+        socket.on('user_joined', (data) => {
+            const user_list = document.getElementById('user_list');
+            const li = document.createElement('li');
+            li.textContent = `${data.username} joined mod ${data.mod_id}`;
+            user_list.appendChild(li);
+        });
+
+        socket.on('user_left', (data) => {
+            alert(`${data.username} left mod ${data.mod_id}`);
+        });
+
+        socket.on('mod_content', (data) => {
+            document.getElementById('mod_content').value = data.content;
+        });
+
+        socket.on('mod_updated', (data) => {
+            document.getElementById('mod_content').value = data.content;
+        });
+    </script>
+</body>
+</html>
