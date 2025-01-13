@@ -1,0 +1,66 @@
+from flask import Flask, request, jsonify
+import os
+import json
+from uuid import uuid4
+
+app = Flask(__name__)
+
+# Carpeta para almacenar mods compartidos
+SHARED_MODS_FOLDER = "shared_mods"
+os.makedirs(SHARED_MODS_FOLDER, exist_ok=True)
+
+@app.route('/save_mod', methods=['POST'])
+def save_mod():
+    try:
+        # Recibir datos del mod
+        data = request.get_json()
+        mod_name = data.get('name', f"Mod_{uuid4().hex[:8]}")
+        mod_description = data.get('description', '')
+        mod_content = data.get('content', {})
+
+        if not mod_description or not mod_content:
+            return jsonify({'error': 'Description and content are required'}), 400
+
+        # Guardar mod en archivo JSON
+        mod_file = os.path.join(SHARED_MODS_FOLDER, f"{mod_name}.json")
+        with open(mod_file, 'w') as file:
+            json.dump({'name': mod_name, 'description': mod_description, 'content': mod_content}, file)
+
+        return jsonify({'message': 'Mod saved successfully', 'mod_name': mod_name}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/list_mods', methods=['GET'])
+def list_mods():
+    try:
+        mods = []
+        for mod_file in os.listdir(SHARED_MODS_FOLDER):
+            if mod_file.endswith('.json'):
+                with open(os.path.join(SHARED_MODS_FOLDER, mod_file), 'r') as file:
+                    mods.append(json.load(file))
+
+        return jsonify({'mods': mods}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/get_mod/<mod_name>', methods=['GET'])
+def get_mod(mod_name):
+    try:
+        mod_file = os.path.join(SHARED_MODS_FOLDER, f"{mod_name}.json")
+        if not os.path.exists(mod_file):
+            return jsonify({'error': 'Mod not found'}), 404
+
+        with open(mod_file, 'r') as file:
+            mod_data = json.load(file)
+
+        return jsonify({'mod': mod_data}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+if __name__ == '__main__':
+    app.run(debug=True)
