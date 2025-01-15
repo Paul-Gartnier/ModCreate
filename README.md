@@ -63,22 +63,76 @@ ModCreate harnesses the power of advanced AI technologies to interpret natural l
 
 Follow these steps to set up and run ModCreate locally:
 
-1. Clone the repository:
+
    ```bash
    git clone https://github.com/yourusername/ModCreate.git
+   touch .env
+
    ```
-2. Navigate to the project directory:
    ```bash
    cd ModCreate
+   FLASK_ENV=development
+   SECRET_KEY=your_secret_key_here
+
    ```
-3. Install the required dependencies:
+
    ```bash
    pip install -r requirements.txt
+   from dotenv import load_dotenv
+   import os
+
+   load_dotenv()
+   secret_key = os.getenv("SECRET_KEY", "default_secret_key")
+
    ```
-4. Launch the application:
+
    ```bash
-   python app.py
-   ```
+import logging
+logging.basicConfig(
+   filename='logs/app.log',
+   level=logging.DEBUG,
+   format='%(asctime)s - %(levelname)s - %(message)s'
+   )
+   logging.info("ModCreate application started.")
+```
+
+Run Pre Launch Checks
+   ```bash
+
+import os
+
+def check_environment():
+    required_env_vars = ["SECRET_KEY"]
+    for var in required_env_vars:
+        if os.getenv(var) is None:
+            print(f"Error: Environment variable {var} is not set.")
+            return False
+    return True
+
+def check_dependencies():
+    try:
+        import flask
+        import transformers
+        print("Dependencies verified.")
+        return True
+    except ImportError as e:
+        print(f"Missing dependency: {e}")
+        return False
+
+if __name__ == "__main__":
+    if check_environment() and check_dependencies():
+        print("Pre-launch checks passed.")
+    else:
+        print("Pre-launch checks failed. Please fix the issues above.")
+
+Run the script
+   ```bash
+python pre_launch_check.py
+```
+
+   
+
+   
 ---
 ![4](https://github.com/user-attachments/assets/9b0c4b47-3f62-4cb3-b3d1-e4c6b07bcc6a)
 
