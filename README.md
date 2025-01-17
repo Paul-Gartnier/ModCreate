@@ -150,8 +150,9 @@ This project is licensed under the [MIT License](LICENSE). See the license file 
 
 ---
 
-## **Connect with Us**
+## **Linlks**
 
+- **Whitepaper:** [Whitepaper](https://modcreate-ai.gitbook.io/modcreate-ai-docs/)
 - **GitHub:** [ModCreate Repository](https://github.com/yourusername/ModCreate)  
 - **Twitter:** [@ModCreateAI](https://twitter.com/ModCreateAI)
 
