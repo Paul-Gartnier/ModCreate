@@ -153,7 +153,6 @@ This project is licensed under the [MIT License](LICENSE). See the license file 
 ## **Connect with Us**
 
 - **GitHub:** [ModCreate Repository](https://github.com/yourusername/ModCreate)  
-- **Email:** your-email@example.com  
 - **Twitter:** [@ModCreateAI](https://twitter.com/ModCreateAI)
 
 ---
